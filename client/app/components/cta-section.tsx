@@ -8,6 +8,7 @@ export const CTASection = () => {
                 Ready to Find Your Match?
             </h2>
             <Button size="lg" className="text-lg px-8 py-6">
+
                 Register Now
             </Button>
         </section>

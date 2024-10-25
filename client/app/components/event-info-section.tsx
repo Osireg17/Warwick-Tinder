@@ -1,13 +1,14 @@
 'use client'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, MapPin } from 'lucide-react';
+import { Calendar, Clock, MapPin, PoundSterling } from 'lucide-react';
 import { EventDetail } from "@/types";
 
 const EVENT_DETAILS: EventDetail[] = [
     { icon: Calendar, text: "November 21 & 22, 2024" },
-    { icon: Clock, text: "8:00 PM" },
-    { icon: MapPin, text: "The Grand Ballroom, 123 Love Street, Cityville" },
+    { icon: Clock, text: "8:00 PM - 10:00PM" },
+    { icon: MapPin, text: "The Green Room" },
+    { icon: PoundSterling, text: "Price: £6" }
 ];
 
 export const EventInfoSection = () => {
@@ -22,10 +23,13 @@ export const EventInfoSection = () => {
                     </CardHeader>
                     <CardContent>
                         <p className="text-gray-600 mb-4">
-                            Experience the thrill of meeting new people in a carefully curated environment.
-                            Our blind date event is designed to spark genuine connections and create lasting memories.
-                            Whether you&apos;re searching for love or expanding your social circle, this evening promises
-                            excitement, laughter, and the potential for something special.
+                            Want to get cuffed this holiday season?🥰 Want to make new friends before the term ends?🤝Look no further, we have the solution for you! (Best part: you help raise money for the charity Movember!) 🥳
+                        </p>
+                        <p className="text-gray-600 mb-4">
+                            Join us as we pair you with a mystery date carefully selected for you using an algorithm powered by Warwick Data Science Society📲Just fill our form and let us do the work to find you the perfect date!🫶
+                        </p>
+                        <p className="text-gray-600 mb-4">
+                            Options for romantic dates and friendship dates are available! There will also be additional drinks and a dessert menu available on the day to order!🍹🍨
                         </p>
                         <Button variant="outline" className="w-full">Learn More</Button>
                     </CardContent>

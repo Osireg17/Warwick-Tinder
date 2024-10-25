@@ -207,7 +207,7 @@ export default function Register() {
                 <CardFooter>
                     <div className="text-sm text-gray-600 text-center w-full">
                         Already have an account?{' '}
-                        <Link href="/sign-in" className="text-rose-600 hover:underline">
+                        <Link href="/auth/signin" className="text-rose-600 hover:underline">
                             Sign in here
                         </Link>
                     </div>
