@@ -1,5 +1,6 @@
 'use client'
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export const CTASection = () => {
     return (
@@ -8,8 +9,9 @@ export const CTASection = () => {
                 Ready to Find Your Match?
             </h2>
             <Button size="lg" className="text-lg px-8 py-6">
-
-                Register Now
+                <Link href="/auth/register">
+                    Register Now
+                </Link>
             </Button>
         </section>
     );
