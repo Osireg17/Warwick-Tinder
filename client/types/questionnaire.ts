@@ -1,10 +1,10 @@
-export interface LikertQuestion {
-    key: string;
+export interface LikertOption {
+    value: number;
     label: string;
 }
 
-export interface LikertOption {
-    value: string;
+export interface LikertQuestion {
+    key: string;
     label: string;
 }
 

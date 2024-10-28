@@ -30,7 +30,7 @@ export function LikertQuestions({ questions, form }: LikertQuestionsProps) {
                                     {LIKERT_OPTIONS.map((option) => (
                                         <FormItem key={option.value} className="flex items-center space-x-3 space-y-0">
                                             <FormControl>
-                                                <RadioGroupItem value={option.value} />
+                                                <RadioGroupItem value={option.value.toString()} />
                                             </FormControl>
                                             <FormLabel className="font-normal">
                                                 {option.label}

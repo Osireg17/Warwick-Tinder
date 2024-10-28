@@ -3,11 +3,11 @@ import { database } from "./appwrite";
 import { ID, Query } from 'appwrite';
 
 export const LIKERT_OPTIONS: LikertOption[] = [
-    { value: '1', label: 'Strongly disagree' },
-    { value: '2', label: 'Disagree' },
-    { value: '3', label: 'Neutral' },
-    { value: '4', label: 'Agree' },
-    { value: '5', label: 'Strongly agree' },
+    { value: 1, label: 'Strongly disagree' },
+    { value: 2, label: 'Disagree' },
+    { value: 3, label: 'Neutral' },
+    { value: 4, label: 'Agree' },
+    { value: 5, label: 'Strongly agree' },
 ];
 
 export const QUESTIONS: LikertQuestion[] = [
@@ -45,8 +45,18 @@ const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DB_ID as string
 const COLLECTION_ID = process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_ID as string
 
 export const questionnaireService = {
-    async submit(data: QuestionnaireData, userId: string) {
+    async submitQuestionnaire(data: QuestionnaireData, userId: string) {
         try {
+            const existing = await database.listDocuments(
+                DATABASE_ID,
+                COLLECTION_ID,
+                [Query.equal('userId', userId)]
+            );
+
+            if (existing.documents.length > 0) {
+                throw new Error('You have already submitted a questionnaire');
+            }
+
             return await database.createDocument(
                 DATABASE_ID,
                 COLLECTION_ID,
@@ -54,30 +64,12 @@ export const questionnaireService = {
                 {
                     ...data,
                     userId,
-                    createdAt: new Date().toISOString(),
+                    submittedAt: new Date().toISOString(),
                 }
             );
         } catch (error) {
             console.error('Error submitting questionnaire:', error);
             throw error;
         }
-    },
-
-    async getSubmission(userId: string) {
-        try {
-            const response = await database.listDocuments(
-                DATABASE_ID,
-                COLLECTION_ID,
-                [
-                    // Query to find submission by userId
-                    // Add index for userId in Appwrite console
-                    Query.equal('userId', userId)
-                ]
-            );
-            return response.documents[0];
-        } catch (error) {
-            console.error('Error fetching questionnaire:', error);
-            throw error;
-        }
-    },
+    }
 };
