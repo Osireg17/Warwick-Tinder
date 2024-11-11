@@ -5,7 +5,7 @@ import { EventDetail } from "@/types";
 
 const EVENT_DETAILS: EventDetail[] = [
     { icon: Calendar, text: "November 21 & 22, 2024" },
-    { icon: Clock, text: "6:00 PM - 9:00PM" },
+    { icon: Clock, text: "7:00 PM - 9:00PM" },
     { icon: MapPin, text: "Esquires, Leamington Spa CV32 5JS" },
     { icon: PoundSterling, text: "Price: £8.50" }
 ];
