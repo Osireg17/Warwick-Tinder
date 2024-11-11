@@ -8,7 +8,7 @@ const EVENT_DETAILS: EventDetail[] = [
     { icon: Calendar, text: "November 21 & 22, 2024" },
     { icon: Clock, text: "6:00 PM - 9:00PM" },
     { icon: MapPin, text: "Esquires, Leamington Spa CV32 5JS" },
-    { icon: PoundSterling, text: "Price: £6" }
+    { icon: PoundSterling, text: "Price: £8.50" }
 ];
 
 export const EventInfoSection = () => {
@@ -29,7 +29,7 @@ export const EventInfoSection = () => {
                             Join us as we pair you with a mystery date carefully selected for you using an algorithm powered by Warwick Data Science Society📲Just fill our form and let us do the work to find you the perfect date!🫶
                         </p>
                         <p className="text-gray-600 mb-4">
-                            Options for romantic dates and friendship dates are available! There will also be additional drinks and a dessert menu available on the day to order!🍹🍨
+                            Options for romantic dates and friendship dates are available!
                         </p>
                         <Button variant="outline" className="w-full">Learn More</Button>
                     </CardContent>
