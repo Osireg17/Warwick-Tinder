@@ -29,7 +29,6 @@ import { useUser } from '../hooks/useUser'
 import { QuestionnaireData } from '@/types/questionnaire'
 
 const formSchema = z.object({
-    // Basic info (Step 1)
     studentId: z.string()
         .min(1, { message: "Please enter your student ID" })
         .regex(/^\d{7}$/, { message: "Student ID must be 7 digits" }),
@@ -41,7 +40,6 @@ const formSchema = z.object({
         .refine(value => ['2024-11-21', '2024-11-22'].includes(value), {
             message: "Please select one of the available dates"
         }),
-    // Preferences (Step 2)
     yearPreference: z.string()
         .min(1, { message: "Please select your year preference" }),
     dateType: z.string()
@@ -50,7 +48,6 @@ const formSchema = z.object({
         .min(1, { message: "Please select your preferred date format" }),
     partnerPreference: z.string()
         .min(1, { message: "Please select your partner preference" }),
-    // Likert questions (Steps 3-6)
     ...Object.fromEntries(QUESTIONS.map(q => [
         q.key,
         z.number()
@@ -87,7 +84,6 @@ export default function Questionnaire() {
         },
     })
 
-    // Show loading state while checking user authentication
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -96,7 +92,6 @@ export default function Questionnaire() {
         )
     }
 
-    // Show error if no user is authenticated
     if (!user) {
         return (
             <div className="min-h-screen flex items-center justify-center">

@@ -45,7 +45,7 @@ export default function DashboardLayout({
                             className="flex items-center gap-2 hover:opacity-90 transition-opacity"
                         >
                             <Heart className="h-8 w-8 text-rose-500" />
-                            <span className="text-2xl font-bold text-gray-800">First Date</span>
+                            <span className="text-2xl font-bold text-gray-800">First Dates with RAG x WDSS</span>
                         </Link>
                         <Button
                             variant="ghost"
