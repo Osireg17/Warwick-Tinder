@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useUser } from '../hooks/useUser'
 import { useRouter } from 'next/navigation'
@@ -226,13 +226,6 @@ export default function Dashboard() {
                             <li>Instagram: @warwickdatasciencesociety</li>
                         </ul>
                     </CardContent>
-                    <CardFooter>
-                        <Button variant="outline" asChild>
-                            <Link href="/contact">
-                                Contact Support
-                            </Link>
-                        </Button>
-                    </CardFooter>
                 </Card>
             </div>
         </div>
