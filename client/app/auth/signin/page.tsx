@@ -42,7 +42,7 @@ export default function SignIn() {
         try {
             setIsLoading(true)
 
-            await auth.createSession(values.email, values.password)
+            await auth.createEmailPasswordSession(values.email, values.password)
 
             toast({
                 title: "Welcome back!",
