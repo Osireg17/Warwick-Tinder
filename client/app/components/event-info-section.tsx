@@ -1,6 +1,5 @@
 'use client'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Calendar, Clock, MapPin, PoundSterling } from 'lucide-react';
 import { EventDetail } from "@/types";
 
@@ -31,7 +30,6 @@ export const EventInfoSection = () => {
                         <p className="text-gray-600 mb-4">
                             Options for romantic dates and friendship dates are available!
                         </p>
-                        <Button variant="outline" className="w-full">Learn More</Button>
                     </CardContent>
                 </Card>
                 <Card className="bg-white/90 backdrop-blur-sm">
