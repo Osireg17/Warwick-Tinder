@@ -302,9 +302,9 @@ export default function Questionnaire() {
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
-                                                            <SelectItem value="same">Same year as me</SelectItem>
-                                                            <SelectItem value="different">Different year as me</SelectItem>
-                                                            <SelectItem value="any">Open to any year</SelectItem>
+                                                            <SelectItem value="Same year as me">Same year as me</SelectItem>
+                                                            <SelectItem value="Different year as me">Different year as me</SelectItem>
+                                                            <SelectItem value="Open to any year">Open to any year</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                     <FormMessage />
