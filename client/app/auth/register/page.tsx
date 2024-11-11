@@ -1,5 +1,4 @@
 'use client'
-
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -66,13 +65,17 @@ export default function Register() {
 
             await auth.createEmailPasswordSession(values.email, values.password)
 
+            await auth.createVerification(
+                `${window.location.origin}/auth/verify`
+            )
+
             toast({
-                title: "Welcome!",
-                description: "Your account has been created successfully.",
+                title: "Account Created!",
+                description: "Please check your email to verify your account.",
                 variant: "default",
             })
 
-            router.push('/questionnaire')
+            router.push('/auth/verification-sent')
 
         } catch (error: unknown) {
             console.error('Registration error:', error)

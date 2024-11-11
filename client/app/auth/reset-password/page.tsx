@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -7,9 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Heart, Loader2 } from 'lucide-react'
+import { Loader2, KeyRound } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { auth } from '@/lib/appwrite'
 import { useToast } from "@/hooks/use-toast"
 
@@ -20,21 +19,19 @@ const formSchema = z.object({
         .refine((email) => /^[a-zA-Z0-9._%+-]+@(warwick\.ac\.uk|live\.warwick\.ac\.uk)$/.test(email), {
             message: "Please use your Warwick University email"
         }),
-    password: z.string().min(8, { message: "Password must be at least 8 characters" }),
 })
 
 type FormData = z.infer<typeof formSchema>
 
-export default function SignIn() {
+export default function ResetPassword() {
     const { toast } = useToast()
-    const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
+    const [emailSent, setEmailSent] = useState(false)
 
     const form = useForm<FormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             email: "",
-            password: "",
         },
     })
 
@@ -42,38 +39,22 @@ export default function SignIn() {
         try {
             setIsLoading(true)
 
-            await auth.createSession(values.email, values.password)
+            await auth.createRecovery(
+                values.email,
+                `${window.location.origin}/auth/reset-password/confirm`
+            )
 
+            setEmailSent(true)
             toast({
-                title: "Welcome back!",
-                description: "You've been successfully signed in.",
+                title: "Recovery Email Sent",
+                description: "Please check your email for password reset instructions.",
             })
 
-            // Check if the user's email is verified
-            const account = await auth.get()
-
-            if (!account.emailVerification) {
-                router.push('/auth/verification-sent')
-            } else {
-                router.push('/dashboard')
-            }
-
-        } catch (error: unknown) {
-            console.error('Sign in error:', error)
-
-            let errorMessage = "Failed to sign in. Please try again."
-
-            if (error instanceof Error && 'type' in error) {
-                if (error.type === 'user_invalid_credentials') {
-                    errorMessage = "Invalid email or password"
-                } else if (error.type === 'user_not_found') {
-                    errorMessage = "No account found with this email"
-                }
-            }
-
+        } catch (error) {
+            console.error('Password reset error:', error)
             toast({
                 title: "Error",
-                description: errorMessage,
+                description: "Failed to send recovery email. Please try again.",
                 variant: "destructive",
             })
         } finally {
@@ -81,18 +62,48 @@ export default function SignIn() {
         }
     }
 
+    if (emailSent) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-rose-100 to-teal-100 flex items-center justify-center p-4">
+                <Card className="w-full max-w-md">
+                    <CardHeader>
+                        <div className="flex justify-center mb-4">
+                            <KeyRound className="h-12 w-12 text-green-500" />
+                        </div>
+                        <CardTitle className="text-2xl font-bold text-center">Check Your Email</CardTitle>
+                        <CardDescription className="text-center">
+                            We&apos;ve sent password reset instructions to your email address.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardFooter className="flex flex-col gap-4">
+                        <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => setEmailSent(false)}
+                        >
+                            Send Another Email
+                        </Button>
+                        <Button asChild variant="ghost" className="w-full">
+                            <Link href="/auth/signin">
+                                Back to Sign In
+                            </Link>
+                        </Button>
+                    </CardFooter>
+                </Card>
+            </div>
+        )
+    }
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-rose-100 to-teal-100 flex items-center justify-center p-4">
             <Card className="w-full max-w-md">
-                <CardHeader className="space-y-1">
-                    <div className="flex items-center justify-center mb-4">
-                        <Link href="/" className="hover:opacity-90 transition-opacity">
-                            <Heart className="h-12 w-12 text-rose-500" />
-                        </Link>
+                <CardHeader>
+                    <div className="flex justify-center mb-4">
+                        <KeyRound className="h-12 w-12 text-rose-500" />
                     </div>
-                    <CardTitle className="text-2xl font-bold text-center">Sign in to Love Connect</CardTitle>
+                    <CardTitle className="text-2xl font-bold text-center">Reset Password</CardTitle>
                     <CardDescription className="text-center">
-                        Enter your Warwick email and password to access your account
+                        Enter your email address and we&apos;ll send you instructions to reset your password.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -119,25 +130,6 @@ export default function SignIn() {
                                     </FormItem>
                                 )}
                             />
-                            <FormField
-                                control={form.control}
-                                name="password"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Password</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="password"
-                                                placeholder="••••••••"
-                                                autoComplete="current-password"
-                                                disabled={isLoading}
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
                             <Button
                                 type="submit"
                                 className="w-full"
@@ -146,31 +138,21 @@ export default function SignIn() {
                                 {isLoading ? (
                                     <>
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Signing in...
+                                        Sending Instructions...
                                     </>
                                 ) : (
-                                    "Sign In"
+                                    "Send Reset Instructions"
                                 )}
                             </Button>
                         </form>
                     </Form>
                 </CardContent>
-                <CardFooter className="flex flex-col space-y-2">
-                    <Button
-                        variant="link"
-                        asChild
-                        className="text-sm text-gray-600 hover:text-rose-600"
-                    >
-                        <Link href="/auth/reset-password">
-                            Forgot your password?
+                <CardFooter>
+                    <Button asChild variant="ghost" className="w-full">
+                        <Link href="/auth/signin">
+                            Back to Sign In
                         </Link>
                     </Button>
-                    <div className="text-sm text-gray-600">
-                        Don&apos;t have an account?{' '}
-                        <Link href="/auth/register" className="text-rose-600 hover:underline">
-                            Register here
-                        </Link>
-                    </div>
                 </CardFooter>
             </Card>
         </div>

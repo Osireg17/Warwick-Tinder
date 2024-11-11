@@ -74,7 +74,6 @@ export default function Questionnaire() {
         },
     })
 
-    // Show loading state while checking user authentication
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -83,7 +82,6 @@ export default function Questionnaire() {
         )
     }
 
-    // Show error if no user is authenticated
     if (!user) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -97,7 +95,7 @@ export default function Questionnaire() {
         setShowConfirmDialog(true)
     }
 
-    const onSubmit = async () => {
+    async function onSubmit() {
         if (!formDataToSubmit || !user) {
             toast({
                 title: "Error",
@@ -113,10 +111,10 @@ export default function Questionnaire() {
 
             toast({
                 title: "Success!",
-                description: "Your questionnaire has been submitted. We'll notify you when we find a match!",
+                description: "Your questionnaire has been submitted. Time to get your tickets!",
             })
 
-            router.push('/dashboard')
+            router.push('/confirmation')
 
         } catch (error: unknown) {
             console.error('Submission error:', error)
