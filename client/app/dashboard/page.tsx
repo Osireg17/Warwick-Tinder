@@ -8,7 +8,7 @@ import { useUser } from '../hooks/useUser'
 import { useRouter } from 'next/navigation'
 import { database } from '@/lib/appwrite'
 import { Query } from 'appwrite'
-import { ExternalLink, Loader2, Heart, Calendar, Clock, MapPin, AlertTriangle, CheckCircle, HelpCircle } from 'lucide-react'
+import { ExternalLink, Loader2, Heart, Calendar, Clock, MapPin, AlertTriangle, CheckCircle, HelpCircle, Mail } from 'lucide-react'
 import { EVENT_INFO } from '@/lib/constants'
 import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
@@ -250,13 +250,22 @@ export default function Dashboard() {
                             We&apos;re here to ensure your First Date experience is smooth and enjoyable. Don&apos;t hesitate to reach out:
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <Button variant="outline" className="flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-mail"><rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
-                                Email Us
+                            <Button variant="outline" asChild>
+                                <Link
+                                    href="mailto:warwickdatasciencesociety@gmail.com"
+                                    className="flex items-center gap-2"
+                                >
+                                    <Mail className="h-5 w-5" />
+                                    Email Us
+                                </Link>
                             </Button>
                             <Button variant="outline" className="flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></svg>
-                                Follow on Instagram
+                                <a href="https://www.instagram.com/warwickrag/" target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></svg>
+                                    Follow on Instagram
+                                </a>
                             </Button>
                         </div>
                     </CardContent>
