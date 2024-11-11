@@ -1,4 +1,5 @@
-'use client'
+'use client';
+import { Suspense } from 'react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -25,15 +26,31 @@ const formSchema = z.object({
     path: ["confirmPassword"],
 })
 
-type FormData = z.infer<typeof formSchema>
+export default function ResetPasswordPage() {
+    return (
+        <Suspense fallback={<LoadingCard />}>
+            <ResetPasswordContent />
+        </Suspense>
+    )
+}
 
-export default function ResetPasswordConfirm() {
+function LoadingCard() {
+    return (
+        <Card className="w-full max-w-md">
+            <CardContent className="flex justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-rose-500" />
+            </CardContent>
+        </Card>
+    )
+}
+
+function ResetPasswordContent() {
     const { toast } = useToast()
     const searchParams = useSearchParams()
     const [isLoading, setIsLoading] = useState(false)
     const [isComplete, setIsComplete] = useState(false)
 
-    const form = useForm<FormData>({
+    const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             password: "",
@@ -41,7 +58,7 @@ export default function ResetPasswordConfirm() {
         },
     })
 
-    async function onSubmit(values: FormData) {
+    async function onSubmit(values: z.infer<typeof formSchema>) {
         const userId = searchParams.get('userId')
         const secret = searchParams.get('secret')
 
@@ -60,9 +77,8 @@ export default function ResetPasswordConfirm() {
             await auth.updateRecovery(
                 userId,
                 secret,
-                values.confirmPassword
+                values.password
             )
-
 
             setIsComplete(true)
             toast({
@@ -84,98 +100,94 @@ export default function ResetPasswordConfirm() {
 
     if (isComplete) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-rose-100 to-teal-100 flex items-center justify-center p-4">
-                <Card className="w-full max-w-md">
-                    <CardHeader>
-                        <div className="flex justify-center mb-4">
-                            <CheckCircle className="h-12 w-12 text-green-500" />
-                        </div>
-                        <CardTitle className="text-2xl font-bold text-center">Password Reset Complete</CardTitle>
-                        <CardDescription className="text-center">
-                            Your password has been reset successfully. You can now sign in with your new password.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardFooter>
-                        <Button asChild className="w-full">
-                            <Link href="/auth/signin">
-                                Sign In
-                            </Link>
-                        </Button>
-                    </CardFooter>
-                </Card>
-            </div>
+            <Card className="w-full max-w-md">
+                <CardHeader>
+                    <div className="flex justify-center mb-4">
+                        <CheckCircle className="h-12 w-12 text-green-500" />
+                    </div>
+                    <CardTitle className="text-2xl font-bold text-center">Password Reset Complete</CardTitle>
+                    <CardDescription className="text-center">
+                        Your password has been reset successfully. You can now sign in with your new password.
+                    </CardDescription>
+                </CardHeader>
+                <CardFooter>
+                    <Button asChild className="w-full">
+                        <Link href="/auth/signin">
+                            Sign In
+                        </Link>
+                    </Button>
+                </CardFooter>
+            </Card>
         )
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-rose-100 to-teal-100 flex items-center justify-center p-4">
-            <Card className="w-full max-w-md">
-                <CardHeader>
-                    <div className="flex justify-center mb-4">
-                        <KeyRound className="h-12 w-12 text-rose-500" />
-                    </div>
-                    <CardTitle className="text-2xl font-bold text-center">Create New Password</CardTitle>
-                    <CardDescription className="text-center">
-                        Please enter your new password below.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                            <FormField
-                                control={form.control}
-                                name="password"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>New Password</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="password"
-                                                placeholder="••••••••"
-                                                disabled={isLoading}
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="confirmPassword"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Confirm New Password</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="password"
-                                                placeholder="••••••••"
-                                                disabled={isLoading}
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <Button
-                                type="submit"
-                                className="w-full"
-                                disabled={isLoading}
-                            >
-                                {isLoading ? (
-                                    <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Resetting Password...
-                                    </>
-                                ) : (
-                                    "Reset Password"
-                                )}
-                            </Button>
-                        </form>
-                    </Form>
-                </CardContent>
-            </Card>
-        </div>
+        <Card className="w-full max-w-md">
+            <CardHeader>
+                <div className="flex justify-center mb-4">
+                    <KeyRound className="h-12 w-12 text-rose-500" />
+                </div>
+                <CardTitle className="text-2xl font-bold text-center">Create New Password</CardTitle>
+                <CardDescription className="text-center">
+                    Please enter your new password below.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <FormField
+                            control={form.control}
+                            name="password"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>New Password</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="password"
+                                            placeholder="••••••••"
+                                            disabled={isLoading}
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="confirmPassword"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Confirm New Password</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="password"
+                                            placeholder="••••••••"
+                                            disabled={isLoading}
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <Button
+                            type="submit"
+                            className="w-full"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Resetting Password...
+                                </>
+                            ) : (
+                                "Reset Password"
+                            )}
+                        </Button>
+                    </form>
+                </Form>
+            </CardContent>
+        </Card>
     )
 }

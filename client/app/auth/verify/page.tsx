@@ -1,4 +1,5 @@
-'use client'
+'use client';
+import { Suspense } from 'react'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { auth } from '@/lib/appwrite'
@@ -7,7 +8,25 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react'
 import Link from 'next/link'
 
-export default function VerifyEmail() {
+export default function VerifyPage() {
+    return (
+        <Suspense fallback={<LoadingCard />}>
+            <VerifyContent />
+        </Suspense>
+    )
+}
+
+function LoadingCard() {
+    return (
+        <Card className="w-full max-w-md">
+            <CardContent className="flex justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-rose-500" />
+            </CardContent>
+        </Card>
+    )
+}
+
+function VerifyContent() {
     const searchParams = useSearchParams()
     const [verificationState, setVerificationState] = useState<'loading' | 'success' | 'error'>('loading')
     const [error, setError] = useState<string>('')
@@ -101,11 +120,5 @@ export default function VerifyEmail() {
         }
     }
 
-    return (
-        <div className="min-h-screen bg-gradient-to-br from-rose-100 to-teal-100 flex items-center justify-center p-4">
-            <Card className="w-full max-w-md">
-                {renderContent()}
-            </Card>
-        </div>
-    )
+    return <Card className="w-full max-w-md">{renderContent()}</Card>
 }
