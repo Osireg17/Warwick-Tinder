@@ -138,7 +138,7 @@ export default function Register() {
                                     <FormLabel>Warwick Email</FormLabel>
                                     <FormControl>
                                         <Input
-                                            placeholder="u1234567@live.warwick.ac.uk or firstname.lastname@warwick.ac.uk"
+                                            placeholder="u1234567@live.warwick.ac.uk"
                                             type="email"
                                             autoCapitalize="none"
                                             autoComplete="email"

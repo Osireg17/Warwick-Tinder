@@ -106,7 +106,7 @@ export default function SignIn() {
                                         <FormLabel>Warwick Email</FormLabel>
                                         <FormControl>
                                             <Input
-                                                placeholder="u1234567@warwick.ac.uk"
+                                                placeholder="u1234567@live.warwick.ac.uk"
                                                 type="email"
                                                 autoCapitalize="none"
                                                 autoComplete="email"
