@@ -6,6 +6,7 @@ import { CheckCircle2, Calendar, ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { EVENT_INFO } from '@/lib/constants'
 import { useUser } from '../hooks/useUser'
+import Link from 'next/link'
 
 export default function Confirmation() {
     const router = useRouter()
@@ -76,11 +77,11 @@ export default function Confirmation() {
                             Purchase Tickets on Warwick SU
                         </Button>
                     </a>
-                    {/* <Button asChild variant="outline" className="w-full">
+                    <Button asChild variant="outline" className="w-full">
                         <Link href="/dashboard">
                             Go to Dashboard
                         </Link>
-                    </Button> */}
+                    </Button>
                 </CardFooter>
             </Card>
         </div>
