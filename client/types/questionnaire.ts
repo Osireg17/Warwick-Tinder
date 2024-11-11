@@ -13,9 +13,9 @@ export interface QuestionnaireData {
     identity: string;
     preferredDate: string;
     yearOfStudy: string;
-    partnerPreference: string;
+    yearPreference: string;
     dateType: string;
-    relationshipType: string;
-    interestedIn: string;
+    partnerPreference: string;
+    dateFormat: string;
     [key: string]: string;
 }

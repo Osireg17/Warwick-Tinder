@@ -1,8 +1,9 @@
 // components/layout.tsx
 import React from 'react';
-import { Heart } from 'lucide-react';
+import { Heart, LayoutDashboard } from 'lucide-react';
 import Link from 'next/link';
 import { Toaster } from '@/components/ui/toaster';
+import { Button } from '@/components/ui/button';
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -22,6 +23,29 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             <Heart className="h-8 w-8 text-rose-500" />
                             <span className="text-2xl font-bold text-gray-800">First Dates with RAG x WDSS</span>
                         </Link>
+                        <div className="flex items-center gap-4">
+                            <Button
+                                asChild
+                                variant="outline"
+                                className="hidden sm:flex items-center gap-2"
+                            >
+                                <Link href="/dashboard">
+                                    <LayoutDashboard className="h-4 w-4" />
+                                    Dashboard
+                                </Link>
+                            </Button>
+                            {/* Mobile version - icon only */}
+                            <Button
+                                asChild
+                                variant="outline"
+                                size="icon"
+                                className="sm:hidden"
+                            >
+                                <Link href="/dashboard">
+                                    <LayoutDashboard className="h-4 w-4" />
+                                </Link>
+                            </Button>
+                        </div>
                     </div>
                 </nav>
             </header>
