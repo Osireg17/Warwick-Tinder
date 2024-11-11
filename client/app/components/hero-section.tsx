@@ -1,5 +1,6 @@
 'use client'
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export const HeroSection = () => {
     return (
@@ -11,7 +12,9 @@ export const HeroSection = () => {
                 Join us for an unforgettable evening of connections and new beginnings
             </p>
             <Button size="lg" className="text-lg px-8 py-6">
-                Reserve Your Spot
+                <Link href="/auth/register">
+                    Reserve Your Spot
+                </Link>
             </Button>
         </section>
     );
