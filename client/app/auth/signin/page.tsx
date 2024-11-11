@@ -116,6 +116,11 @@ export default function SignIn() {
                                             />
                                         </FormControl>
                                         <FormMessage />
+                                        <p className="text-sm text-muted-foreground mt-1">
+                                            Please use:
+                                            <br />
+                                            • Student ID format: u1234567@live.warwick.ac.uk
+                                        </p>
                                     </FormItem>
                                 )}
                             />
