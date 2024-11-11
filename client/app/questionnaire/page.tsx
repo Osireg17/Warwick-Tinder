@@ -1,4 +1,5 @@
 'use client';
+
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -28,19 +29,33 @@ import { useUser } from '../hooks/useUser'
 import { QuestionnaireData } from '@/types/questionnaire'
 
 const formSchema = z.object({
-    studentId: z.string().min(1, { message: "Student ID is required" }),
-    identity: z.string().min(1, { message: "Identity is required" }),
-    yearOfStudy: z.string().min(1, { message: "Year of study is required" }),
-    preferredDate: z.string().refine(value => ['2024-11-21', '2024-11-22'].includes(value), {
-        message: "Please select one of the available dates"
-    }),
-    yearPreference: z.string().min(1, { message: "Year preference is required" }),
-    dateType: z.string().min(1, { message: "Date type is required" }),
-    dateFormat: z.string().min(1, { message: "Date format is required" }),
-    partnerPreference: z.string().min(1, { message: "Partner preference is required" }),
+    // Basic info (Step 1)
+    studentId: z.string()
+        .min(1, { message: "Please enter your student ID" })
+        .regex(/^\d{7}$/, { message: "Student ID must be 7 digits" }),
+    identity: z.string()
+        .min(1, { message: "Please select how you identify" }),
+    yearOfStudy: z.string()
+        .min(1, { message: "Please select your year of study" }),
+    preferredDate: z.string()
+        .refine(value => ['2024-11-21', '2024-11-22'].includes(value), {
+            message: "Please select one of the available dates"
+        }),
+    // Preferences (Step 2)
+    yearPreference: z.string()
+        .min(1, { message: "Please select your year preference" }),
+    dateType: z.string()
+        .min(1, { message: "Please select the type of date you prefer" }),
+    dateFormat: z.string()
+        .min(1, { message: "Please select your preferred date format" }),
+    partnerPreference: z.string()
+        .min(1, { message: "Please select your partner preference" }),
+    // Likert questions (Steps 3-6)
     ...Object.fromEntries(QUESTIONS.map(q => [
         q.key,
-        z.number().min(1).max(5)
+        z.number()
+            .min(1, { message: "Please select an option" })
+            .max(5)
     ]))
 }) as z.ZodType<QuestionnaireData>;
 
@@ -58,6 +73,7 @@ export default function Questionnaire() {
 
     const form = useForm<FormData>({
         resolver: zodResolver(formSchema),
+        mode: "onChange",
         defaultValues: {
             studentId: '',
             identity: '',
@@ -66,10 +82,12 @@ export default function Questionnaire() {
             yearPreference: '',
             dateType: '',
             dateFormat: '',
+            partnerPreference: '',
             ...Object.fromEntries(QUESTIONS.map(q => [q.key, 0]))
         },
     })
 
+    // Show loading state while checking user authentication
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -78,6 +96,7 @@ export default function Questionnaire() {
         )
     }
 
+    // Show error if no user is authenticated
     if (!user) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -86,16 +105,72 @@ export default function Questionnaire() {
         )
     }
 
-    const handleSubmit = (data: FormData) => {
+    const getFieldsForStep = (currentStep: number) => {
+        switch (currentStep) {
+            case 1:
+                return ['studentId', 'identity', 'yearOfStudy', 'preferredDate']
+            case 2:
+                return ['yearPreference', 'dateType', 'dateFormat', 'partnerPreference']
+            default:
+                const startIndex = (currentStep - 3) * 7
+                return QUESTIONS.slice(startIndex, startIndex + 7).map(q => q.key)
+        }
+    }
+
+    const validateStep = async (stepNumber: number) => {
+        const fields = getFieldsForStep(stepNumber)
+        const isValid = await form.trigger(fields as string[])
+
+        if (!isValid) {
+            toast({
+                title: "Please check your answers",
+                description: `Some fields in step ${stepNumber} need your attention`,
+                variant: "destructive",
+            })
+        }
+
+        return isValid
+    }
+
+    const nextStep = async () => {
+        const isValid = await validateStep(step)
+        if (isValid) {
+            setStep(current => Math.min(current + 1, totalSteps))
+            window.scrollTo(0, 0)
+        }
+    }
+
+    const prevStep = () => {
+        setStep(current => Math.max(current - 1, 1))
+        window.scrollTo(0, 0)
+    }
+
+    const handleSubmit = async (data: FormData) => {
+        // Validate all steps before showing confirmation
+        let firstInvalidStep = null
+
+        for (let i = 1; i <= totalSteps; i++) {
+            const isStepValid = await validateStep(i)
+            if (!isStepValid && !firstInvalidStep) {
+                firstInvalidStep = i
+            }
+        }
+
+        if (firstInvalidStep) {
+            setStep(firstInvalidStep)
+            window.scrollTo(0, 0)
+            return
+        }
+
         setFormDataToSubmit(data)
         setShowConfirmDialog(true)
     }
 
-    async function onSubmit() {
+    const onSubmit = async () => {
         if (!formDataToSubmit || !user) {
             toast({
                 title: "Error",
-                description: !user ? "Please log in to submit" : "Please complete the questionnaire",
+                description: !user ? "Please log in to submit" : "Please complete all required fields",
                 variant: "destructive",
             })
             return
@@ -130,30 +205,6 @@ export default function Questionnaire() {
         }
     }
 
-    const nextStep = () => {
-        if (step === 1) {
-            form.trigger(['studentId', 'identity', 'yearOfStudy', 'preferredDate']).then((isValid) => {
-                if (isValid) setStep(current => current + 1)
-            })
-        } else if (step === 2) {
-            form.trigger(['yearPreference', 'dateType', 'dateFormat', 'partnerPreference']).then((isValid) => {
-                if (isValid) setStep(current => current + 1)
-            })
-        } else {
-            setStep(current => Math.min(current + 1, totalSteps))
-        }
-    }
-
-    const prevStep = () => {
-        setStep(current => Math.max(current - 1, 1))
-    }
-
-    const getCurrentQuestions = () => {
-        if (step <= 2) return []
-        const startIndex = (step - 3) * 7
-        return QUESTIONS.slice(startIndex, startIndex + 7)
-    }
-
     const getStepTitle = () => {
         switch (step) {
             case 1: return "Basic Information"
@@ -164,6 +215,12 @@ export default function Questionnaire() {
             case 6: return "Personality Questions (4/4)"
             default: return ""
         }
+    }
+
+    const getCurrentQuestions = () => {
+        if (step <= 2) return []
+        const startIndex = (step - 3) * 7
+        return QUESTIONS.slice(startIndex, startIndex + 7)
     }
 
     return (
@@ -187,8 +244,14 @@ export default function Questionnaire() {
                                                 <FormItem>
                                                     <FormLabel>Student ID</FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="Enter your student ID" {...field} />
+                                                        <Input
+                                                            placeholder="Enter your 7-digit student ID"
+                                                            {...field}
+                                                        />
                                                     </FormControl>
+                                                    <FormDescription>
+                                                        Your 7-digit Warwick student ID number
+                                                    </FormDescription>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
@@ -202,7 +265,7 @@ export default function Questionnaire() {
                                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                         <FormControl>
                                                             <SelectTrigger>
-                                                                <SelectValue placeholder="Select your identity" />
+                                                                <SelectValue placeholder="Select how you identify" />
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
@@ -220,7 +283,7 @@ export default function Questionnaire() {
                                             name="preferredDate"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Which day would you prefer the date to be on?</FormLabel>
+                                                    <FormLabel>Which day would you prefer?</FormLabel>
                                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                         <FormControl>
                                                             <SelectTrigger>
@@ -302,9 +365,9 @@ export default function Questionnaire() {
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
-                                                            <SelectItem value="Same year as me">Same year as me</SelectItem>
-                                                            <SelectItem value="Different year as me">Different year as me</SelectItem>
-                                                            <SelectItem value="Open to any year">Open to any year</SelectItem>
+                                                            <SelectItem value="same">Same year as me</SelectItem>
+                                                            <SelectItem value="different">Different year from me</SelectItem>
+                                                            <SelectItem value="any">Open to any year</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                     <FormMessage />
@@ -316,18 +379,23 @@ export default function Questionnaire() {
                                             name="dateFormat"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>I want a...</FormLabel>
+                                                    <FormLabel>I prefer...</FormLabel>
                                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                         <FormControl>
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder="Date preference" />
+                                                            <SelectTrigger
+                                                                className="flex items-center justify-between"
+                                                            >
+                                                                <SelectValue placeholder="Select date format" />
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
-                                                            <SelectItem value="One-on-one">One-on-one date</SelectItem>
-                                                            <SelectItem value="Double date (Matched with another date pair)">Double date (Matched with another date pair)</SelectItem>
+                                                            <SelectItem value="one-on-one">One-on-one date</SelectItem>
+                                                            <SelectItem value="double">Double date (matched with another pair)</SelectItem>
                                                         </SelectContent>
                                                     </Select>
+                                                    <FormDescription>
+                                                        Choose between a private date or double date with another matched pair
+                                                    </FormDescription>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
@@ -337,11 +405,11 @@ export default function Questionnaire() {
                                             name="partnerPreference"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>I am interested in....</FormLabel>
+                                                    <FormLabel>I am interested in...</FormLabel>
                                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                         <FormControl>
                                                             <SelectTrigger>
-                                                                <SelectValue placeholder="Date preference" />
+                                                                <SelectValue placeholder="Select your preference" />
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
@@ -350,6 +418,9 @@ export default function Questionnaire() {
                                                             <SelectItem value="everyone">Everyone</SelectItem>
                                                         </SelectContent>
                                                     </Select>
+                                                    <FormDescription>
+                                                        Who would you like to be matched with?
+                                                    </FormDescription>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
@@ -415,6 +486,7 @@ export default function Questionnaire() {
                             <Button
                                 onClick={nextStep}
                                 disabled={isSubmitting}
+                                className="bg-rose-500 hover:bg-rose-600"
                             >
                                 Next
                             </Button>
@@ -422,6 +494,7 @@ export default function Questionnaire() {
                             <Button
                                 onClick={form.handleSubmit(handleSubmit)}
                                 disabled={isSubmitting}
+                                className="bg-rose-500 hover:bg-rose-600"
                             >
                                 {isSubmitting ? (
                                     <div className="flex items-center gap-2">
@@ -441,8 +514,9 @@ export default function Questionnaire() {
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Confirm Submission</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Are you sure you want to submit your questionnaire? You won&apos;t be able to modify your answers after submission.
+                        <AlertDialogDescription className="space-y-2">
+                            <p>Are you sure you want to submit your questionnaire?</p>
+                            <p>You won&apos;t be able to modify your answers after submission.</p>
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
