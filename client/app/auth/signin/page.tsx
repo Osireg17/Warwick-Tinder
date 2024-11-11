@@ -50,7 +50,7 @@ export default function SignIn() {
             })
 
             // Go straight to questionnaire
-            router.push('/questionnaire')
+            router.push('/dashboard')
 
         } catch (error: unknown) {
             console.error('Sign in error:', error)
