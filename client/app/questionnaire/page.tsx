@@ -28,19 +28,16 @@ import { useUser } from '../hooks/useUser'
 import { QuestionnaireData } from '@/types/questionnaire'
 
 const formSchema = z.object({
-    // Basic info (Step 1)
     studentId: z.string().min(1, { message: "Student ID is required" }),
     identity: z.string().min(1, { message: "Identity is required" }),
     yearOfStudy: z.string().min(1, { message: "Year of study is required" }),
-    // Preferences (Step 2)
-    partnerPreference: z.string().min(1, { message: "Partner preference is required" }),
-    dateType: z.string().min(1, { message: "Date type is required" }),
-    relationshipType: z.string().min(1, { message: "Relationship type is required" }),
-    interestedIn: z.string().min(1, { message: "Interest is required" }),
     preferredDate: z.string().refine(value => ['2024-11-21', '2024-11-22'].includes(value), {
         message: "Please select one of the available dates"
     }),
-    // Likert questions (Steps 3-6)
+    yearPreference: z.string().min(1, { message: "Year preference is required" }),
+    dateType: z.string().min(1, { message: "Date type is required" }),
+    dateFormat: z.string().min(1, { message: "Date format is required" }),
+    partnerPreference: z.string().min(1, { message: "Partner preference is required" }),
     ...Object.fromEntries(QUESTIONS.map(q => [
         q.key,
         z.number().min(1).max(5)
@@ -64,12 +61,11 @@ export default function Questionnaire() {
         defaultValues: {
             studentId: '',
             identity: '',
-            preferredDate: '',
             yearOfStudy: '',
-            partnerPreference: '',
+            preferredDate: '',
+            yearPreference: '',
             dateType: '',
-            relationshipType: '',
-            interestedIn: '',
+            dateFormat: '',
             ...Object.fromEntries(QUESTIONS.map(q => [q.key, 0]))
         },
     })
@@ -136,11 +132,11 @@ export default function Questionnaire() {
 
     const nextStep = () => {
         if (step === 1) {
-            form.trigger(['studentId', 'identity', 'preferredDate', 'yearOfStudy']).then((isValid) => {
+            form.trigger(['studentId', 'identity', 'yearOfStudy', 'preferredDate']).then((isValid) => {
                 if (isValid) setStep(current => current + 1)
             })
         } else if (step === 2) {
-            form.trigger(['partnerPreference', 'dateType', 'relationshipType', 'interestedIn']).then((isValid) => {
+            form.trigger(['yearPreference', 'dateType', 'dateFormat', 'partnerPreference']).then((isValid) => {
                 if (isValid) setStep(current => current + 1)
             })
         } else {
@@ -213,7 +209,6 @@ export default function Questionnaire() {
                                                             <SelectItem value="male">Male</SelectItem>
                                                             <SelectItem value="female">Female</SelectItem>
                                                             <SelectItem value="non-binary">Non-binary</SelectItem>
-                                                            <SelectItem value="other">Other</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                     <FormMessage />
@@ -257,11 +252,11 @@ export default function Questionnaire() {
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
-                                                            <SelectItem value="1">First Year</SelectItem>
-                                                            <SelectItem value="2">Second Year</SelectItem>
-                                                            <SelectItem value="3">Third Year</SelectItem>
-                                                            <SelectItem value="4">Fourth Year</SelectItem>
-                                                            <SelectItem value="5+">Fifth Year or above</SelectItem>
+                                                            <SelectItem value="1">1st Year</SelectItem>
+                                                            <SelectItem value="2">2nd Year</SelectItem>
+                                                            <SelectItem value="3">3rd Year</SelectItem>
+                                                            <SelectItem value="4">4th Year</SelectItem>
+                                                            <SelectItem value="postgraduate">Postgraduate</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                     <FormMessage />
@@ -275,29 +270,6 @@ export default function Questionnaire() {
                                     <>
                                         <FormField
                                             control={form.control}
-                                            name="partnerPreference"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>I would like to go on a date with someone who is...</FormLabel>
-                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                        <FormControl>
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder="Select your preference" />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent>
-                                                            <SelectItem value="male">Male</SelectItem>
-                                                            <SelectItem value="female">Female</SelectItem>
-                                                            <SelectItem value="non-binary">Non-binary</SelectItem>
-                                                            <SelectItem value="any">Any gender</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
                                             name="dateType"
                                             render={({ field }) => (
                                                 <FormItem>
@@ -309,10 +281,8 @@ export default function Questionnaire() {
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
-                                                            <SelectItem value="blind">Blind Date</SelectItem>
-                                                            <SelectItem value="activity">Activity Date</SelectItem>
-                                                            <SelectItem value="dinner">Dinner Date</SelectItem>
-                                                            <SelectItem value="coffee">Coffee Date</SelectItem>
+                                                            <SelectItem value="romantic">Romantic Date</SelectItem>
+                                                            <SelectItem value="friend">Friend Date</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                     <FormMessage />
@@ -321,21 +291,41 @@ export default function Questionnaire() {
                                         />
                                         <FormField
                                             control={form.control}
-                                            name="relationshipType"
+                                            name="yearPreference"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>I would like to go on a date with someone who is...</FormLabel>
+                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                        <FormControl>
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Select your preference" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            <SelectItem value="same">Same year as me</SelectItem>
+                                                            <SelectItem value="different">Different year as me</SelectItem>
+                                                            <SelectItem value="any">Open to any year</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="dateFormat"
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>I want a...</FormLabel>
                                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                         <FormControl>
                                                             <SelectTrigger>
-                                                                <SelectValue placeholder="Select relationship type" />
+                                                                <SelectValue placeholder="Date preference" />
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
-                                                            <SelectItem value="casual">Casual Relationship</SelectItem>
-                                                            <SelectItem value="serious">Serious Relationship</SelectItem>
-                                                            <SelectItem value="friendship">Friendship</SelectItem>
-                                                            <SelectItem value="open">Open to anything</SelectItem>
+                                                            <SelectItem value="One-on-one">One-on-one date</SelectItem>
+                                                            <SelectItem value="Double date (Matched with another date pair)">Double date (Matched with another date pair)</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                     <FormMessage />
@@ -344,25 +334,20 @@ export default function Questionnaire() {
                                         />
                                         <FormField
                                             control={form.control}
-                                            name="interestedIn"
+                                            name="partnerPreference"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>I am interested in...</FormLabel>
+                                                    <FormLabel>I am interested in....</FormLabel>
                                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                         <FormControl>
                                                             <SelectTrigger>
-                                                                <SelectValue placeholder="Select your interests" />
+                                                                <SelectValue placeholder="Date preference" />
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
-                                                            <SelectItem value="sports">Sports</SelectItem>
-                                                            <SelectItem value="music">Music</SelectItem>
-                                                            <SelectItem value="art">Art</SelectItem>
-                                                            <SelectItem value="technology">Technology</SelectItem>
-                                                            <SelectItem value="travel">Travel</SelectItem>
-                                                            <SelectItem value="food">Food</SelectItem>
-                                                            <SelectItem value="reading">Reading</SelectItem>
-                                                            <SelectItem value="movies">Movies</SelectItem>
+                                                            <SelectItem value="men">Men</SelectItem>
+                                                            <SelectItem value="women">Women</SelectItem>
+                                                            <SelectItem value="everyone">Everyone</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                     <FormMessage />
