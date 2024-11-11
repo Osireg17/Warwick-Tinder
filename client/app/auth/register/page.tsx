@@ -14,7 +14,6 @@ import { auth } from '@/lib/appwrite'
 import { ID } from 'appwrite'
 import { useToast } from "@/hooks/use-toast"
 
-
 const formSchema = z.object({
     name: z.string().min(2, { message: "Name must be at least 2 characters" }),
     email: z
@@ -55,7 +54,6 @@ export default function Register() {
         try {
             setIsLoading(true)
 
-            // Create user account
             await auth.create(
                 ID.unique(),
                 values.email,
@@ -65,17 +63,13 @@ export default function Register() {
 
             await auth.createEmailPasswordSession(values.email, values.password)
 
-            await auth.createVerification(
-                `${window.location.origin}/auth/verify`
-            )
-
             toast({
-                title: "Account Created!",
-                description: "Please check your email to verify your account.",
+                title: "Welcome!",
+                description: "Your account has been created successfully.",
                 variant: "default",
             })
 
-            router.push('/auth/verification-sent')
+            router.push('/questionnaire')
 
         } catch (error: unknown) {
             console.error('Registration error:', error)

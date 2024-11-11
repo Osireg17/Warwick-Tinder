@@ -17,6 +17,7 @@ export function useUser() {
         const checkUser = async () => {
             try {
                 const currentUser = await auth.get();
+                console.log(currentUser);
                 setUser(currentUser);
             } catch {
                 setUser(null);
