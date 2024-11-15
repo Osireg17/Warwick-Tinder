@@ -1,22 +1,30 @@
+// components/universal-header.tsx
 'use client'
 
-import { Heart, LayoutDashboard, Loader2, LogOut } from 'lucide-react'
+import { Heart, LogOut, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 import { auth } from '@/lib/appwrite'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useToast } from '@/hooks/use-toast'
-import { useSession } from '../hooks/useSession'
 
-export function Header() {
-  const { isLoading, hasSession } = useSession()
+import { useState } from 'react'
+import { useUser } from '../hooks/useUser'
+
+export function UniversalHeader() {
+  const { user, loading, isAdmin } = useUser()
   const router = useRouter()
+  const pathname = usePathname()
   const { toast } = useToast()
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  const isAdminPage = pathname?.startsWith('/admin')
 
   const handleLogout = async () => {
     try {
+      setIsLoggingOut(true)
       await auth.deleteSession('current')
-      router.push('/auth/signin')
+      router.push('/')
       toast({
         title: "Signed out",
         description: "You've been successfully signed out.",
@@ -28,53 +36,81 @@ export function Header() {
         description: "Failed to sign out. Please try again.",
         variant: "destructive",
       })
+    } finally {
+      setIsLoggingOut(false)
     }
+  }
+
+  // If user is loading, show minimal header
+  if (loading) {
+    return (
+      <header className="bg-white/80 backdrop-blur-md border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <div className="flex items-center gap-2">
+              <Heart className="h-8 w-8 text-rose-500" />
+              <span className="text-2xl font-bold text-gray-800">
+                First Dates with RAG x WDSS
+              </span>
+            </div>
+          </div>
+        </div>
+      </header>
+    )
   }
 
   return (
     <header className="bg-white/80 backdrop-blur-md border-b">
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <Link
-            href="/"
+            href={user ? "/dashboard" : "/"}
             className="flex items-center gap-2 hover:opacity-90 transition-opacity"
           >
             <Heart className="h-8 w-8 text-rose-500" />
-            <span className="text-2xl font-bold text-gray-800">First Dates with RAG x WDSS</span>
+            <span className="text-2xl font-bold text-gray-800">
+              {isAdminPage ? "Admin Dashboard" : "First Dates with RAG x WDSS"}
+            </span>
           </Link>
+
           <div className="flex items-center gap-4">
-            {isLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-            ) : hasSession ? (
+            {user ? (
               <>
-                <Button
-                  asChild
-                  variant="outline"
-                  className="hidden sm:flex items-center gap-2"
-                >
-                  <Link href="/dashboard">
-                    <LayoutDashboard className="h-4 w-4" />
-                    Dashboard
-                  </Link>
-                </Button>
-                {/* Mobile version - icon only */}
-                <Button
-                  asChild
-                  variant="outline"
-                  size="icon"
-                  className="sm:hidden"
-                >
-                  <Link href="/dashboard">
-                    <LayoutDashboard className="h-4 w-4" />
-                  </Link>
-                </Button>
+                {/* Show admin link if user is admin and not on admin pages */}
+                {isAdmin && !isAdminPage && (
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="hidden sm:flex items-center gap-2"
+                  >
+                    <Link href="/admin">
+                      <Shield className="h-4 w-4 mr-2" />
+                      Admin
+                    </Link>
+                  </Button>
+                )}
+
+                {/* Show dashboard link if on admin pages */}
+                {isAdminPage && (
+                  <Button
+                    asChild
+                    variant="outline"
+                  >
+                    <Link href="/dashboard">
+                      Back to Dashboard
+                    </Link>
+                  </Button>
+                )}
+
+                {/* Logout button */}
                 <Button
                   variant="ghost"
-                  size="icon"
                   onClick={handleLogout}
+                  disabled={isLoggingOut}
                   className="text-gray-600 hover:text-gray-900"
                 >
-                  <LogOut className="h-4 w-4" />
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
                 </Button>
               </>
             ) : (
@@ -89,7 +125,7 @@ export function Header() {
             )}
           </div>
         </div>
-      </nav>
+      </div>
     </header>
   )
 }
