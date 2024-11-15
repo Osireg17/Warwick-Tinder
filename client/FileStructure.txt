@@ -1,0 +1,101 @@
+/Users/osiobomighie/Documents/Warwick-Tinder/
+├── .DS_Store
+├── LICENSE
+├── README.md
+└── client/
+    ├─] .DS_Store (ignored)
+    ├─] .env.local (ignored)
+    ├── .eslintrc.json
+    ├── .gitignore
+    ├─] .next/ (ignored)
+    ├── .swc/
+    │   └── plugins/
+    │       └── v7_macos_aarch64_0.106.15/
+    ├── README.md
+    ├── app/
+    │   ├── apple-touch-icon.png
+    │   ├── auth/
+    │   │   ├── layout.tsx
+    │   │   ├── register/
+    │   │   │   ├── page.test.tsx
+    │   │   │   └── page.tsx
+    │   │   ├── reset-password/
+    │   │   │   ├── confirm/
+    │   │   │   │   ├── layout.tsx
+    │   │   │   │   └── page.tsx
+    │   │   │   └── page.tsx
+    │   │   ├── signin/
+    │   │   │   └── page.tsx
+    │   │   ├── verification-sent/
+    │   │   │   └── page.tsx
+    │   │   └── verify/
+    │   │       └── page.tsx
+    │   ├── client-wrapper.tsx
+    │   ├── components/
+    │   │   ├── LikertQuestions.tsx
+    │   │   ├── countdown-timer.tsx
+    │   │   ├── cta-section.tsx
+    │   │   ├── event-info-section.tsx
+    │   │   ├── footer.tsx
+    │   │   ├── header.tsx
+    │   │   └── hero-section.tsx
+    │   ├── confirmation/
+    │   │   ├── layout.tsx
+    │   │   └── page.tsx
+    │   ├── dashboard/
+    │   │   ├── layout.tsx
+    │   │   └── page.tsx
+    │   ├── favicon/
+    │   │   ├── web-app-manifest-192x192.png
+    │   │   └── web-app-manifest-512x512.png
+    │   ├── favicon-96x96.png
+    │   ├── favicon.ico
+    │   ├── favicon.svg
+    │   ├── fonts/
+    │   │   ├── GeistMonoVF.woff
+    │   │   └── GeistVF.woff
+    │   ├── globals.css
+    │   ├── hooks/
+    │   │   ├── useSession.ts
+    │   │   └── useUser.ts
+    │   ├── layout.tsx
+    │   ├── page.tsx
+    │   ├── questionnaire/
+    │   │   ├── layout.tsx
+    │   │   └── page.tsx
+    │   └── site.webmanifest
+    ├── components/
+    │   └── ui/
+    │       ├── alert-dialog.tsx
+    │       ├── button.tsx
+    │       ├── card.tsx
+    │       ├── form.tsx
+    │       ├── input.tsx
+    │       ├── label.tsx
+    │       ├── progress.tsx
+    │       ├── radio-group.tsx
+    │       ├── select.tsx
+    │       ├── toast.tsx
+    │       └── toaster.tsx
+    ├── components.json
+    ├─] coverage/ (ignored)
+    ├── hooks/
+    │   └── use-toast.ts
+    ├── jest.config.ts
+    ├── lib/
+    │   ├── appwrite.js
+    │   ├── constants.ts
+    │   ├── questionnaire.ts
+    │   └── utils.ts
+    ├── middleware.ts
+    ├─] next-env.d.ts (ignored)
+    ├── next.config.mjs
+    ├─] node_modules/ (ignored)
+    ├── package-lock.json
+    ├── package.json
+    ├── postcss.config.mjs
+    ├── tailwind.config.ts
+    ├── tsconfig.json
+    └── types/
+        ├── index.ts
+        └── questionnaire.ts
